@@ -1,0 +1,18 @@
+net.oostcapital.ontheroad
+
+1. The Application available at https://play.google.com/store/apps/details?id=net.postcapital.ontheroad
+   is here referred to as "the Application".  The developer Postcapital is here referred to as "the devloper".
+   
+2. Play Store data: no personalised information on download of the application
+   is availble except for download and application reliability statistics.
+
+2. User Data: The Application has no permissions to read data outside the application
+   except for online.  The Application may however be able to open data from a drive with
+   "Open With" functionality.
+   The Application shares no data what so ever with any third parties or the 
+   Developer apart from what is available from the play store statistics.  
+   It is by intent a purely offline and private application except for "Share As" functionality.
+   The application can import data from publicly available online sources iinto the application:
+
+3. Application Data: Any data that is saved within the applicaiton is saved within the application's own privacy sandbox
+   using AES encryption.  The data is never saved on media storage in an unencrypted form on the disk of the device.
