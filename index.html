@@ -16,11 +16,12 @@
         flex-wrap: wrap;
         flex-direction: row;
         justify-content: start;
-        align-items: auto;
         align-content: start
       }
       .resource {
         max-width: initial;
+        flex-wrap: wrap;
+        flex-direction: columnw;
         flex: 1;
         margin: 20px;
       }  
@@ -28,8 +29,10 @@
     <script type="module" crossorigin src="dist.js"></script>
   </head>
 	<body>
-    <h2>data|visualisation|art|science</h2>
-    <div id="app" class="container"></div>
+    <h2>data|visualisation|science|art</h2>
+    <div id="app" class="container">
+      <div id="viewPort"></div>
+    </div>
     <div class="container">
       <div id="roadLink" class="resource">
         <a target="play-store" href="https://play.google.com/store/apps/details?id=net.postcapital.ontheroad">

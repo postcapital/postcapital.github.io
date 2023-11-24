@@ -1,16 +1,67 @@
 import { select, color, geoCircle, json, geoGraticule10 } from "d3";
 import { geoProjection, geoEqualEarth, geoOrthographic, geoEquirectangularRaw,
-  geoNaturalEarth1, geoPath } from "d3-geo"
-import {geoAugustRaw} from 'd3-geo-projection';
-import { mesh, feature } from "topojson";
+  geoNaturalEarth1, geoPath } from 'd3-geo'
+import {geoAugustRaw} from 'd3-geo-projection'
+import { mesh, feature } from 'topojson'
 
-import { render, useRef, useEffect } from 'preact';
+import { render } from 'preact'
+import useFetch from "react-fetch-hook";
+import { useEffect, useRef } from 'preact/hooks'
 // import './style.css';
+const [data, loading] = useFetch(
+    "data/countries-50m.json"
+)
 
-export function App() {
+function DataResource(props) {
 	return (
-    <div>
-      <GeopethMap class="container">
+		<a href={props.href} target="_blank" class="resource">
+			<h2>{props.title}</h2>
+			<p>{props.description}</p>
+		</a>
+	)
+}
+
+
+const projection2 = geoAugustRaw()
+
+const GeopethMap = () => {
+//const world = json('data/countries-50m.json');
+
+  useEffect(() => {
+
+    const width = 960
+    const height = 960
+
+    const svgRef = useRef()
+    const projection = geoEqualEarth()
+    const svg = select(svgRef.current)
+
+    //const svg = select("#viewPort").attr("width", width).attr("height", height);
+    const pathGenerator = geoPath().projection(projection)
+
+    const countries = feature(data, data.objects.countries);
+    svg.append('path')
+      .attr('class', 'sphere')
+      .attr('d', pathGenerator({ type: 'Sphere' }))
+      .style("fill", color("#eea"))
+    
+    svg.selectAll('path').data(countries.features)
+      .enter().append('path')
+      .attr('d', pathGenerator)
+      .style("fill", color("#333"))
+
+  return (
+        <svg ref={svgRef}>
+        </svg>
+    )
+  })
+}
+
+
+const App = () => {
+	return (
+    <div class="container">
+      <GeopethMap>
       </GeopethMap>
       <div class="resource">
         <section>
@@ -27,57 +78,13 @@ export function App() {
         </section>
       </div>
     </div>
-	);
-}
-
-function DataResource(props) {
-	return (
-		<a href={props.href} target="_blank" class="resource">
-			<h2>{props.title}</h2>
-			<p>{props.description}</p>
-		</a>
-	);
+	)
 }
 
 render(<App />, document.getElementById('app'));
 
-const projection2 = geoAugustRaw();
-//const svg = select("#viewPort").attr("width", width).attr("height", height);
 
-const GeopethMap = () => {
-//const world = json('data/countries-50m.json');
-
-  useEffect(() => {
-
-    const width = 960, height = 960;
-
-    const svgRef = useRef();
-    const projection = geoEqualEarth();
-    const svg = select(svgRef.current);
-    const pathGenerator = geoPath().projection(projection);
-
-    svg.append('path')
-      .attr('class', 'sphere')
-      .attr('d', pathGenerator({ type: 'Sphere' }))
-      .style("fill", color("steelblue"))
-    
-    json('data/countries-50m.json')
-      .then(data => {
-        const countries = feature(data, data.objects.countries);
-        svg.selectAll('path').data(countries.features)
-          .enter().append('path')
-          .attr('d', pathGenerator)
-          .style("fill", color("#333"))
-    });
-
-    return (
-          <svg ref={svgRef}>
-          </svg>
-      );
-  }
-}
-
-function render(projection) {
+function render2(projection) {
   //const path = geoPath(projection, svg);
   // svg.clearRect(0, 0, width, height);
   //svg.save();
