@@ -25,7 +25,6 @@ function DataResource(props) {
 const projection2 = geoAugustRaw()
 
 const GeopethMap = () => {
-//const world = json('data/countries-50m.json');
 
   useEffect(() => {
 
@@ -35,11 +34,11 @@ const GeopethMap = () => {
     const svgRef = useRef()
     const projection = geoEqualEarth()
     const svg = select(svgRef.current)
-
+    console.log('inside:' + loaded)
     //const svg = select("#viewPort").attr("width", width).attr("height", height);
     const pathGenerator = geoPath().projection(projection)
 
-    const countries = feature(data, data.objects.countries);
+    const countries = feature([data], [data].objects.countries);
     svg.append('path')
       .attr('class', 'sphere')
       .attr('d', pathGenerator({ type: 'Sphere' }))
@@ -166,7 +165,7 @@ function antipode(longitude, latitude) { return [longitude + 180, -latitude]; }
 function update2() {
  d3.select('svg')
    .selectAll('circle')
-   .data(data)
+   .data([data])
    .join('circle')
    .attr('cy', 50)
    .transition()

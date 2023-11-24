@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="favicon.ico">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="color-scheme" content="light dark" />
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet" type="text/css">
@@ -19,30 +19,33 @@
         align-content: start
       }
       .resource {
-        max-width: initial;
+        min-width: 20em;
         flex-wrap: wrap;
         flex-direction: columnw;
         flex: 1;
         margin: 20px;
-      }  
+      }
+      .sbox {
+        width: 80px;
+      }
     </style>
-    <script type="module" crossorigin src="dist.js"></script>
+    <!--<script type="module" crossorigin src="dist.js"></script>-->
   </head>
 	<body>
-    <h2>data|visualisation|science|art</h2>
-    <div id="app" class="container">
-      <div id="viewPort"></div>
-    </div>
+    <h1>data|visualisation|science|art</h1>
     <div class="container">
-      <div id="roadLink" class="resource">
-        <a target="play-store" href="https://play.google.com/store/apps/details?id=net.postcapital.ontheroad">
-          <img width="72" src="ontheroad_icon.png" />
-          Introducing Road: a new pocket usable data explorer, editor and visualiser
-        </a>
-      </div>
       <div id="siteLink" class="resource">
         <a target="play-store" href="https://postcapital.github.io">
-          <img width="50%" src="postcapital2012logo.png" />
+          <img width="100%" src="postcapital2012logo.png" />
+        </a>
+      </div>
+      <!--<div id="app" class="container"></div>-->
+      <div class="resource">
+        <a target="play-store" href="https://play.google.com/store/apps/details?id=net.postcapital.ontheroad">
+          <img width="72" src="ontheroad_icon.png" />
+          <div class="sbox">
+            Introducing Road: <i>a new pocket data explorer, editor and visualiser</i>
+          </div>
         </a>
       </div>
     </div>
