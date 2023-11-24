@@ -5,22 +5,43 @@
     <link rel="icon" type="image/svg+xml" href="favicon.ico" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="color-scheme" content="light dark" />
-		<title>Postcapital: data art</title>
-		<script type="module" crossorigin src="dist.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet" type="text/css">
+		<title>postcapital.net: data art</title>
+    <style>
+      body { background-color: #ececea; font-family: "Source Sans Pro", sans-serif; }
+      a { color: #3f697c; }
+      h1,h2 { color: #3f697c; }
+      .container {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        justify-content: start;
+        align-items: auto;
+        align-content: start
+      }
+      .resource {
+        max-width: initial;
+        flex: 1;
+        margin: 20px;
+      }  
+    </style>
+    <script type="module" crossorigin src="dist.js"></script>
   </head>
 	<body>
-    <div id="app">
-
-    </div>
-      <div id="viewPortOuter">
-        <svg id="viewPort"></svg>
+    <h2>data|visualisation|art|science</h2>
+    <div id="app" class="container"></div>
+    <div class="container">
+      <div id="roadLink" class="resource">
+        <a target="play-store" href="https://play.google.com/store/apps/details?id=net.postcapital.ontheroad">
+          <img width="72" src="ontheroad_icon.png" />
+          Introducing Road: a new pocket usable data explorer, editor and visualiser
+        </a>
       </div>
-
-    <div>
-      <a target="play-store" href="https://play.google.com/store/apps/details?id=net.postcapital.ontheroad">
-        <img src="ontheroad_icon.png" />
-        Road Play Store
-      </a>
-	  </div>
+      <div id="siteLink" class="resource">
+        <a target="play-store" href="https://postcapital.github.io">
+          <img width="50%" src="postcapital2012logo.png" />
+        </a>
+      </div>
+    </div>
   </body>
 </html>

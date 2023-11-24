@@ -4,31 +4,78 @@ import { geoProjection, geoEqualEarth, geoOrthographic, geoEquirectangularRaw,
 import {geoAugustRaw} from 'd3-geo-projection';
 import { mesh, feature } from "topojson";
 
-const width = 960, height = 960;
-const projection = geoEqualEarth();
+import { render, useRef, useEffect } from 'preact';
+// import './style.css';
+
+export function App() {
+	return (
+    <div>
+      <GeopethMap class="container">
+      </GeopethMap>
+      <div class="resource">
+        <section>
+          <DataResource
+            title="Marriage Rates"
+            description="Marriage Rates"
+            href="https://ourworldindata.org/marriages-and-divorces"
+          />
+          <DataResource
+            title="CO2 and greenhouse gas emissions"
+            description="Carbon Mitigation"
+            href="https://ourworldindata.org/co2-and-greenhouse-gas-emissions"
+          />
+        </section>
+      </div>
+    </div>
+	);
+}
+
+function DataResource(props) {
+	return (
+		<a href={props.href} target="_blank" class="resource">
+			<h2>{props.title}</h2>
+			<p>{props.description}</p>
+		</a>
+	);
+}
+
+render(<App />, document.getElementById('app'));
+
 const projection2 = geoAugustRaw();
-const svg = select("#viewPort").attr("width", width).attr("height", height);
+//const svg = select("#viewPort").attr("width", width).attr("height", height);
 
-const pathGenerator = geoPath().projection(projection);
-
+const GeopethMap = () => {
 //const world = json('data/countries-50m.json');
-// const land = feature(world, world.objects.land)
-svg.append('path')
-  .attr('class', 'sphere')
-  .attr('d', pathGenerator({ type: 'Sphere' }))
-  .style("fill", color("steelblue"))
 
-json('data/countries-50m.json')
-  .then(data => {
-    const countries = feature(data, data.objects.countries);
-    //render(land);
-    svg.selectAll('path').data(countries.features)
-      .enter().append('path')
-      .attr('d', pathGenerator)
-      .style("fill", color("#113"))
-  });
+  useEffect(() => {
 
+    const width = 960, height = 960;
 
+    const svgRef = useRef();
+    const projection = geoEqualEarth();
+    const svg = select(svgRef.current);
+    const pathGenerator = geoPath().projection(projection);
+
+    svg.append('path')
+      .attr('class', 'sphere')
+      .attr('d', pathGenerator({ type: 'Sphere' }))
+      .style("fill", color("steelblue"))
+    
+    json('data/countries-50m.json')
+      .then(data => {
+        const countries = feature(data, data.objects.countries);
+        svg.selectAll('path').data(countries.features)
+          .enter().append('path')
+          .attr('d', pathGenerator)
+          .style("fill", color("#333"))
+    });
+
+    return (
+          <svg ref={svgRef}>
+          </svg>
+      );
+  }
+}
 
 function render(projection) {
   //const path = geoPath(projection, svg);
@@ -108,4 +155,25 @@ function fit(raw) {
 // ease = easeCubicInOut
 
 function antipode(longitude, latitude) { return [longitude + 180, -latitude]; }
+
+function update2() {
+ d3.select('svg')
+   .selectAll('circle')
+   .data(data)
+   .join('circle')
+   .attr('cy', 50)
+   .transition()
+   .attr('cx', function(d) {
+     return d.x;
+   })
+   .transition()
+   .duration(750)
+   .ease(d3.easeBounce)
+   .attr('r', function(d) {
+     return d.r;
+   });
+}
+
+
+
 
