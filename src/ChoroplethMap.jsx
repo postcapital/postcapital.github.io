@@ -19,13 +19,10 @@ class ChoroplethMap extends Component {
 
   componentWillMount() { 
     fetch("data/countries-50m.json")
-    .then((response) => {
-      setState({
-                  isLoading: true
-              })
-    }).then((data) => {
+    .then((response) => response.json()
+    ).then((data) => {
 
-      setState({
+      this.setState({
         data:  data,
         isLoading: false
       })
@@ -38,17 +35,17 @@ class ChoroplethMap extends Component {
 
   render(state) {
 
-
+    if(this.state.isLoading == false) {
       const width = 960
       const height = 960
 
-      const svgRef = useRef()
+      // const svgRef = useRef()
       const projection = geoEqualEarth()
-      const svg = select(svgRef.current)
-      //const svg = select("#viewPort").attr("width", width).attr("height", height);
+      // const svg = select(svgRef.current)
+      const svg = select("#svgRef")
       const pathGenerator = geoPath().projection(projection)
-
-      const countries = feature({data}, {data}.objects.countries)
+      const data = this.state.data
+      const countries = feature(data, data.objects.countries)
       svg.append('path')
         .attr('class', 'sphere')
         .attr('d', pathGenerator({ type: 'Sphere' }))
@@ -58,14 +55,14 @@ class ChoroplethMap extends Component {
         .enter().append('path')
         .attr('d', pathGenerator)
         .style("fill", color("#333"))
-
+    }
     return (
-      <div>
+      <div class="resource">
       { state.isLoading &&
           <img src="../ontheroad_icon.png">On the Road logo</img>
       } 
       { !state.isLoading &&
-          <svg ref={svgRef} width={width} height={height}>
+          <svg id="svgRef">
           </svg>
       }
       </div>

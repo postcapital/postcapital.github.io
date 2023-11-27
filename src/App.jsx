@@ -22,7 +22,7 @@ const App = () => {
   }
   return (
   <div>
-    <ChoroplethMap data={null} />
+    <ChoroplethMap />
     <div class="resource">
       <div>
         <section>
