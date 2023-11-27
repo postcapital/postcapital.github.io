@@ -4,7 +4,7 @@ import preact from '@preact/preset-vite';
 export default defineConfig({
 
   build: {
-    rollupOptions : { input: 'src/postcapital_09c.jsx',
+    rollupOptions : { input: 'src/App.jsx',
     output: { dir: '.', entryFileNames: "dist.js" } 
     }
   },
