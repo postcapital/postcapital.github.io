@@ -1,86 +1,80 @@
 import { select, color, geoCircle, json, geoGraticule10 } from "d3";
-import { geoProjection, geoEqualEarth, geoOrthographic, geoEquirectangularRaw,
+import { geoProjection, geoEqualEarth, geoOrthographic,
   geoNaturalEarth1, geoPath } from 'd3-geo'
-import {geoAugustRaw} from 'd3-geo-projection'
+import { geoAugustRaw } from 'd3-geo-projection'
 import { mesh, feature } from 'topojson'
-
-import { render } from 'preact'
-import useFetch from "react-fetch-hook";
 import { useEffect, useRef } from 'preact/hooks'
-// import './style.css';
-const [data, loading] = useFetch(
-    "data/countries-50m.json"
-)
-
-function DataResource(props) {
-	return (
-		<a href={props.href} target="_blank" class="resource">
-			<h2>{props.title}</h2>
-			<p>{props.description}</p>
-		</a>
-	)
-}
+import { Component } from 'react'
 
 
-const projection2 = geoAugustRaw()
+class ChoroplethMap extends Component {
+  constructor( props) {
 
-const GeopethMap = () => {
-
-  useEffect(() => {
-
-    const width = 960
-    const height = 960
-
-    const svgRef = useRef()
-    const projection = geoEqualEarth()
-    const svg = select(svgRef.current)
-    console.log('inside:' + loaded)
-    //const svg = select("#viewPort").attr("width", width).attr("height", height);
-    const pathGenerator = geoPath().projection(projection)
-
-    const countries = feature([data], [data].objects.countries);
-    svg.append('path')
-      .attr('class', 'sphere')
-      .attr('d', pathGenerator({ type: 'Sphere' }))
-      .style("fill", color("#eea"))
+    super();
     
-    svg.selectAll('path').data(countries.features)
-      .enter().append('path')
-      .attr('d', pathGenerator)
-      .style("fill", color("#333"))
+    this.state = { time: Date.now(), dataCon: props,
+    data: [], isLoading: true }
+    console.log("ChoroplethMap instantiated with " + props)
+  }
 
-  return (
-        <svg ref={svgRef}>
-        </svg>
-    )
-  })
-}
+  componentWillMount() { 
+    fetch("data/countries-50m.json")
+    .then((response) => {
+      setState({
+                  isLoading: true
+              })
+    }).then((data) => {
+
+      setState({
+        data:  data,
+        isLoading: false
+      })
+    })
+    .catch((error) => {
+
+      console.log('error: fetch failed'+error)
+    })
+  }
+
+  render(state) {
 
 
-const App = () => {
-	return (
-    <div class="container">
-      <GeopethMap>
-      </GeopethMap>
-      <div class="resource">
-        <section>
-          <DataResource
-            title="Marriage Rates"
-            description="Marriage Rates"
-            href="https://ourworldindata.org/marriages-and-divorces"
-          />
-          <DataResource
-            title="CO2 and greenhouse gas emissions"
-            description="Carbon Mitigation"
-            href="https://ourworldindata.org/co2-and-greenhouse-gas-emissions"
-          />
-        </section>
+      const width = 960
+      const height = 960
+
+      const svgRef = useRef()
+      const projection = geoEqualEarth()
+      const svg = select(svgRef.current)
+      //const svg = select("#viewPort").attr("width", width).attr("height", height);
+      const pathGenerator = geoPath().projection(projection)
+
+      const countries = feature({data}, {data}.objects.countries)
+      svg.append('path')
+        .attr('class', 'sphere')
+        .attr('d', pathGenerator({ type: 'Sphere' }))
+        .style("fill", color("#eea"))
+      
+      svg.selectAll('path').data(countries.features)
+        .enter().append('path')
+        .attr('d', pathGenerator)
+        .style("fill", color("#333"))
+
+    return (
+      <div>
+      { state.isLoading &&
+          <img src="../ontheroad_icon.png">On the Road logo</img>
+      } 
+      { !state.isLoading &&
+          <svg ref={svgRef} width={width} height={height}>
+          </svg>
+      }
       </div>
-    </div>
-	)
+    )
+  }
 }
 
-render(<App />, document.getElementById('app'));
+export default ChoroplethMap
+
 
 
 function render2(projection) {
@@ -94,7 +88,7 @@ function render2(projection) {
   //svg.beginPath(), path(outline), context.strokeStyle = "#000", context.stroke();
 }
 
-var previousProjection = geoEquirectangularRaw;
+//var previousProjection = geoEquirectangularRaw;
 
 function update()  {
   const r0 = previousProjection;
