@@ -35,12 +35,12 @@ class ChoroplethMap extends Component {
 
   render(state) {
 
+    const width = 960
+    const height = 500
     if(this.state.isLoading == false) {
-      const width = 960
-      const height = 960
 
       // const svgRef = useRef()
-      const projection = geoEqualEarth()
+      const projection = geoOrthographic()
       // const svg = select(svgRef.current)
       const svg = select("#svgRef")
       const pathGenerator = geoPath().projection(projection)
@@ -49,20 +49,20 @@ class ChoroplethMap extends Component {
       svg.append('path')
         .attr('class', 'sphere')
         .attr('d', pathGenerator({ type: 'Sphere' }))
-        .style("fill", color("#eea"))
+        .style("fill", color("#edf5f9"))
       
       svg.selectAll('path').data(countries.features)
         .enter().append('path')
         .attr('d', pathGenerator)
-        .style("fill", color("#333"))
+        .style("fill", color("#d1cfcf"))
     }
     return (
-      <div class="resource">
+      <div class="resource" width={width}>
       { state.isLoading &&
           <img src="../ontheroad_icon.png">On the Road logo</img>
       } 
       { !state.isLoading &&
-          <svg id="svgRef">
+          <svg id="svgRef" width={width} height={height}>
           </svg>
       }
       </div>

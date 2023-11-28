@@ -25,7 +25,7 @@ const App = () => {
     <ChoroplethMap />
     <div class="resource">
       <div>
-        <section>
+    {/*<section>
           <DataResource
             title="Marriage Rate"
             description="Marriage Rates"
@@ -36,7 +36,7 @@ const App = () => {
             description="Carbon Mitigation"
             href="https://ourworldindata.org/co2-and-greenhouse-gas-emissions"
           />
-        </section>
+        </section>*/}
       </div>
     </div>
   </div>

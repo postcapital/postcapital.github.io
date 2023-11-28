@@ -13,17 +13,12 @@
       h1,h2 { color: #3f697c; }
       .container {
         display: flex;
-        flex-wrap: wrap;
-        flex-direction: row;
-        justify-content: start;
-        align-content: start
+        flex-direction: column;
       }
       .resource {
-        min-width: 20em;
-        flex-wrap: wrap;
-        flex-direction: columnw;
-        flex: 1;
-        margin: 20px;
+        flex: 2 1 100%;
+        width: 100%;
+        padding: 30px;
       }
       .sbox {
         width: 80px;
@@ -35,11 +30,11 @@
     <h1>data|visualisation|science|art</h1>
     <div class="container">
       <div id="siteLink" class="resource">
-        <a target="play-store" href="https://postcapital.github.io">
+        <a href="https://postcapital.github.io">
           <img width="100%" src="postcapital2012logo.png" />
         </a>
       </div>
-      <div id="app" class="container"></div>
+      <div id="app"></div>
       <div class="resource">
         <a target="play-store" href="https://play.google.com/store/apps/details?id=net.postcapital.ontheroad">
           <img width="72" src="ontheroad_icon.png" />
