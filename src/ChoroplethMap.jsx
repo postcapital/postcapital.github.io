@@ -13,7 +13,8 @@ class ChoroplethMap extends Component {
     super();
     
     this.state = { time: Date.now(), dataCon: props,
-    data: [], isLoading: true }
+    data: [], isLoading: true,  
+    projection: geoOrthographic(), features: null }
     console.log("ChoroplethMap instantiated with " + props)
   }
 
@@ -33,38 +34,57 @@ class ChoroplethMap extends Component {
     })
   }
 
+
+
   render(state) {
 
+    const animate = () => {
+      this.setState({ projection: geoEqualEarth()})
+      console.log('equialEarth started')
+    };
     const width = 960
     const height = 500
+
+    // const svg = select("#svgRef")
+    
+    var featuresPaths = null
+    var path = null
     if(this.state.isLoading == false) {
 
+      const countries = feature(this.state.data, this.state.data.objects.countries)
+      // features = countries.features
       // const svgRef = useRef()
-      const projection = geoOrthographic()
       // const svg = select(svgRef.current)
-      const svg = select("#svgRef")
-      const pathGenerator = geoPath().projection(projection)
-      const data = this.state.data
-      const countries = feature(data, data.objects.countries)
-      svg.append('path')
+      /*svg.append('path')
         .attr('class', 'sphere')
-        .attr('d', pathGenerator({ type: 'Sphere' }))
+        .attr('d', pathGenerator())
         .style("fill", color("#edf5f9"))
-      
-      svg.selectAll('path').data(countries.features)
+     */ 
+       
+      const pathGenerator = geoPath().projection(this.state.projection)
+      /* svg.selectAll('path').data(countries.features)
         .enter().append('path')
         .attr('d', pathGenerator)
-        .style("fill", color("#d1cfcf"))
+        .style("fill", color("#d1cfcf"))*/
+      // path = countries.features
+      featuresPaths  = countries.features.map((f) => {
+        return (
+          <path d={pathGenerator(f)} fill="#edf5f9" />
+        )
+      })
     }
     return (
       <div class="resource" width={width}>
       { state.isLoading &&
-          <img src="../ontheroad_icon.png">On the Road logo</img>
+        <img src="../ontheroad_icon.png">On the Road logo</img>
       } 
       { !state.isLoading &&
-          <svg id="svgRef" width={width} height={height}>
-          </svg>
+        <svg width="100%" height="500">
+          <g>{featuresPaths}</g>
+        </svg>
       }
+        <button onClick={animate}>Animate</button>
+          
       </div>
     )
   }
@@ -170,7 +190,3 @@ function update2() {
      return d.r;
    });
 }
-
-
-
-
