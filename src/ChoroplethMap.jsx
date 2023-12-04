@@ -69,7 +69,7 @@ class ChoroplethMap extends Component {
       // path = countries.features
       featuresPaths  = countries.features.map((f) => {
         return (
-          <path d={pathGenerator(f)} fill="#edf5f9" />
+          <path d={pathGenerator(f)} fill="#c1d4dd" />
         )
       })
     }
