@@ -5,23 +5,16 @@ import { geoAugustRaw } from 'd3-geo-projection'
 import { mesh, feature } from 'topojson'
 import { easeCubicInOut } from 'd3-ease'
 import { useEffect, useRef } from 'preact/hooks'
-import { Component } from 'react'
+import { Component } from 'preact'
 
 
-function getHeight() {
-  const [[x0, y0], [x1, y1]] = geoPath(projection.fitWidth(width, sphere)).bounds(sphere);
-  const dy = Math.ceil(y1 - y0), l = Math.min(Math.ceil(x1 - x0), dy);
-  projection.scale(projection.scale() * (l - 1) / l).precision(0.2);
-  return dy;
-};
-
-class ChoroplethMap extends Component {
+export default class ChoroplethMap extends Component {
   constructor( props) {
 
     super();
     
-    this.state = { time: Date.now(), dataCon: props,
-    data: [], isLoading: true, rotate: [4,0], 
+    this.state = { time: Date.now(),
+    data: [], isLoading: true, rotate: [0, 0], 
     projection: null, features: null }
     console.log("ChoroplethMap instantiated with " + props)
   }
@@ -51,7 +44,7 @@ class ChoroplethMap extends Component {
     return t => geoProjection((x, y) => ChoroplethMap.lerp2(raw0(x, y), raw1(x, y), t))
       .scale(ChoroplethMap.lerp1(scale0, scale1, t))
       .translate(lerp2(translate0, translate1, t))
-      .precisiop(0.1)
+      .precision(0.1)
   }
 
   animate (state) {
@@ -59,7 +52,7 @@ class ChoroplethMap extends Component {
   }
 
   update (state) {
-    if(this.state.isLoading == true) return
+    if (this.state.isLoading == true) return
 
     const ease = easeCubicInOut
     // if (r0 === r1) return
@@ -96,41 +89,50 @@ class ChoroplethMap extends Component {
     const p = geoProjection(raw).fitExtent([[0.5, 0.5], [width - 0.5, height - 0.5]], outline);
     return {scale: p.scale(), translate: p.translate()};
   }
+  
+  handleMouseDown = (e) => {
+    console.log("handleMouseDown:" + e.pageX)
+  }
 
+  handleMouseUp = (e) => {
+    console.log("handleMouseUp:" + e.pageX)
+  }
 
+  handleMouseMove = (e) => {
+    this.setState({rotate: [e.pageX, 0]})
+    console.log("handleMouseMove:" + e.pageX)
+  }
   
   render(state) {
     
+    const width = window.screen.width 
     var featuresPaths = null
     var path = null
     if(this.state.isLoading == false) {
-
       const countries = feature(this.state.data, this.state.data.objects.countries)
-       
-      const width = 600 
-      const height = 800
+      const height = width
       const outline = {type: "Sphere"}
       const pathGenerator = geoPath().projection(this.state.projection
-        //.fitExtent([[0.5, 0.5], [width - 0.5, height - 0.5]], outline)
-        .rotate(this.state.rotate))
+        .fitExtent([[0.7, 0.7], [width - 0.7, height - 0.7]], outline)
+        .rotate(this.state.rotate)
+        .scale(width/5))
       featuresPaths  = countries.features.map((f) => {
         return (
-          <path d={pathGenerator(f)} fill="#c1d4dd" />
+          <path d={pathGenerator(f)} 
+           fill="#c5d3d8" tooltip="country" />
         )
       })
     }
     return (
-      <div class="resource">
-        
+      <div>
       { state.isLoading &&
         <img src="../ontheroad_icon.png">On the Road logo</img>
       } 
       { !state.isLoading &&
         <div>
-          <button onClick={(state) => this.update(state)}>update</button>
-          <button onClick={(state) => this.animate(state)}>animate</button>
-          <svg width="100%" height="600">
-            <g>{featuresPaths}</g>
+          <svg width={width} height={width}
+            onMouseMove={this.handleMouseMove}> 
+          <g>{featuresPaths}</g>
           </svg>
         </div>
       }
@@ -139,21 +141,9 @@ class ChoroplethMap extends Component {
   }
 }
 
-export default ChoroplethMap
-
-function render2(projection) {
-  //const path = geoPath(projection, svg);
-  // svg.clearRect(0, 0, width, height);
-  //svg.save();
-  //svg.beginPath(), path(outline), context.clip(), context.fillStyle = "#fff", context.fillRect(0, 0, width, height);
-  //svg.beginPath(), path(graticule), context.strokeStyle = "#ccc", context.stroke();
-  //svg.beginPath(), path(land), svg.fillStyle = "#000", svg.fill();
-  //svg.restore();
-  //svg.beginPath(), path(outline), context.strokeStyle = "#000", context.stroke();
-}
 
 
 
-const sphere = ({ type: "Sphere" });
+
 
 
