@@ -6,8 +6,7 @@
 // import {forceSimulation, forceCollide, forceX} from "https://cdn.jsdelivr.net/npm/d3-force@3/+esm";
 import { h, render, Component } from 'https://cdn.jsdelivr.net/npm/preact@10.27.2/+esm'; // import './ChoropethMap';
 import {
-    geoProjection, geoOrthographic, geoConicEqualArea, geoCircle,
-    geoNaturalEarth1, geoPath
+    geoProjection, geoConicEquidistant, geoCircle, geoPath
 } from "https://cdn.jsdelivr.net/npm/d3-geo@3/+esm";
 import { feature } from "https://cdn.jsdelivr.net/npm/topojson-client@3/+esm";
 
@@ -20,13 +19,13 @@ class PostcapitalMap extends Component {
             time: Date.now(),
             data: null, isLoading: true, rotate: [0, 0],
             links: [],
-            projection: geoConicEqualArea(), features: null
+            projection: geoConicEquidistant(), features: null
         }
         console.log("Map instantiated");
     }
 
     componentWillMount() {
-        fetch("data/countries-50m.json")
+        fetch("data/land-110m.json")
             .then((response) => response.json()
             ).then((data) => {
                 this.setState({
@@ -115,12 +114,12 @@ class PostcapitalMap extends Component {
 
     handleMouseUp = (e) => {
         //alert(Object.keys(e).toString());
-        this.setState({ rotate: [e.touches[0].pageX, e.touches[0].pageY / 10] })
+        this.setState({ rotate: [e.touches[0].pageX, 0] })
         //console.log("handleMouseUp:" + e.pageY)
     }
 
     handleMouseMove = (e) => {
-        this.setState({ rotate: [e.pageX, e.pageY / 10] })
+        this.setState({ rotate: [e.pageX, 0] })
         //console.log("handleMouseMove:" + e.pageX)
     }
 
@@ -132,8 +131,8 @@ class PostcapitalMap extends Component {
         var path = null
         var circle = geoCircle().center([-4.42, 55.84]).radius(1);
         if (this.state.isLoading != true && this.state.data != null) {
-            const countries = feature(this.state.data, this.state.data.objects.countries)
-            const height = width
+            const countries = feature(this.state.data, this.state.data.objects.land)
+            const height = window.screen.height;
             const outline = { type: "Sphere" }
             const pathGenerator = geoPath().projection(this.state.projection
                 .fitExtent([[0.7, 0.7], [width - 0.7, height - 0.7]], outline)
@@ -157,7 +156,7 @@ class PostcapitalMap extends Component {
                     ),
                     fill: "none", stroke: "skyblue",
                     "stroke-linecap": "round",
-                    "stroke-width": l.seats_2024 / 1e6, tooltip: "route"
+                    "stroke-width": l.seats_2024 / 2e5, tooltip: "route"
                 });
             });
             return h('div',
