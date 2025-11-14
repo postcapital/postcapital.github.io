@@ -19,27 +19,37 @@
     }
 
     h1,
-    h2 {
+    h2,
+    h4 {
       color: #3f697c;
     }
+
     #bort {
       width: 400px;
       align-items: center;
-  display: flex;
-  justify-content: center;
+      display: flex;
+      justify-content: center;
     }
-    #bort img { padding: 2em; }
+
+    #bort img {
+      padding: 2em;
+    }
+
     .container {
       flex-direction: row;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(max(10rem, 100%), 1fr));
+      /*grid-template-columns: repeat(auto-fill, minmax(max(10rem, 100%), 1fr));*/
     }
   </style>
 </head>
 
 <body>
-  <h1>data|science|visualisation</h1>
-  <div class="container">
+  <h2>data|science|visualisation
+    <a href="mailto:&#x70;&#x6f;&#x73;&#x74;&#x63;&#x61;&#x70;&#x69;&#x74;&#x61;&#x6c;&commat;&#x67;&#x6d;&#x61;&#x69;&#x6c;&period;&#x63;&#x6f;&#x6d;">
+      &#x70;&#x6f;&#x73;&#x74;&#x63;&#x61;&#x70;&#x69;&#x74;&#x61;&#x6c;&commat;&#x67;&#x6d;&#x61;&#x69;&#x6c;&period;&#x63;&#x6f;&#x6d;
+    </a>
+  </h2>
+  <div class="">
     <div id="siteLink">
       <a href="https://postcapital.github.io">
         <img width="60%" src="postcapital2012logo.png" />
@@ -52,10 +62,12 @@
         <div id="bort">
 
           <img width="72" src="ontheroad_icon.png" />
-          <span>Introducing Bort for Android: a pocket sized data explorer and visualiser</span>
+          <span>Introducing bort for Android: a pocket sized data explorer and visualiser</span>
         </div>
       </a>
     </div>
+  </div>
+  <div id="pm">
   </div>
 
   <script type="module" src="index.js"></script>

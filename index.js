@@ -6,7 +6,7 @@
 // import {forceSimulation, forceCollide, forceX} from "https://cdn.jsdelivr.net/npm/d3-force@3/+esm";
 import { h, render, Component } from 'https://cdn.jsdelivr.net/npm/preact@10.27.2/+esm'; // import './ChoropethMap';
 import {
-    geoProjection, geoOrthographic,
+    geoProjection, geoOrthographic, geoConicEqualArea, geoCircle,
     geoNaturalEarth1, geoPath
 } from "https://cdn.jsdelivr.net/npm/d3-geo@3/+esm";
 import { feature } from "https://cdn.jsdelivr.net/npm/topojson-client@3/+esm";
@@ -18,10 +18,11 @@ class PostcapitalMap extends Component {
 
         this.state = {
             time: Date.now(),
-            data: [], isLoading: true, rotate: [0, 0],
-            projection: null, features: null
+            data: null, isLoading: true, rotate: [0, 0],
+            links: [],
+            projection: geoConicEqualArea(), features: null
         }
-        console.log("Map instantiated with " + props)
+        console.log("Map instantiated");
     }
 
     componentWillMount() {
@@ -30,14 +31,26 @@ class PostcapitalMap extends Component {
             ).then((data) => {
                 this.setState({
                     data: data,
-                    projection: geoOrthographic(),
-                    isLoading: false
+                    //projection: geoOrthographic(),
+                    //isLoading: true
                 })
             })
             .catch((error) => {
 
                 console.log('error: fetch failed' + error)
-            })
+            });
+        fetch("data/routes_2024.json").then((response) => response.json())
+            .then((data) => {
+
+                this.setState({
+                    links: data,
+                    isLoading: false,
+                })
+            }).catch((error) => {
+
+
+                console.log('error: fetch failed' + error);
+            });
 
         // setInterval(this.update(), 100)
     }
@@ -55,7 +68,7 @@ class PostcapitalMap extends Component {
         setTimeout(this.update(state), 100)
     }
 
-    update(state) {
+    /*update(state) {
         if (this.state.isLoading == true) return
 
         // const ease = easeCubicInOut
@@ -69,14 +82,14 @@ class PostcapitalMap extends Component {
         const t = Date.now()
         const vx = 0.001, vy = -0.001
         const rotate = [vx * t, vy * t]
-        console.log('setting rotate:' + rotate)
+        // console.log('setting rotate:' + rotate)
         //const interval = setInterval(function() {
         // method to be executed;
         //}, 50);
 
         this.setState({ rotate: rotate })
 
-    }
+    }*/
 
     static lerp1(x0, x1, t) {
         return (1 - t) * x0 + t * x1;
@@ -95,25 +108,30 @@ class PostcapitalMap extends Component {
     }
 
     handleMouseDown = (e) => {
-        console.log("handleMouseDown:" + e.pageY)
+        //alert("touch down");
+        //this.setState({ rotate: [0, 0] })
+        //console.log("handleMouseDown:" + e.pageY)
     }
 
     handleMouseUp = (e) => {
-        console.log("handleMouseUp:" + e.pageY)
+        //alert(Object.keys(e).toString());
+        this.setState({ rotate: [e.touches[0].pageX, e.touches[0].pageY / 10] })
+        //console.log("handleMouseUp:" + e.pageY)
     }
 
     handleMouseMove = (e) => {
-        this.setState({ rotate: [e.pageX, 0] })
-        console.log("handleMouseMove:" + e.pageX)
+        this.setState({ rotate: [e.pageX, e.pageY / 10] })
+        //console.log("handleMouseMove:" + e.pageX)
     }
 
-    
+
     render(state) {
 
         const width = window.screen.width;
         var featuresPaths = null
         var path = null
-        if (this.state.isLoading == false) {
+        var circle = geoCircle().center([-4.42, 55.84]).radius(1);
+        if (this.state.isLoading != true && this.state.data != null) {
             const countries = feature(this.state.data, this.state.data.objects.countries)
             const height = width
             const outline = { type: "Sphere" }
@@ -128,28 +146,35 @@ class PostcapitalMap extends Component {
                     fill: "#c5d3d8", tooltip: countryName
                 });
             });
+            var populi = h('path', { d: pathGenerator(circle()), fill: "pink" });
 
-    const link = [
-        {type: "LineString", coordinates: [[100, 60], [-60, -30]]},
-        {type: "LineString", coordinates: [[10, -20], [-60, -30]]},
-        {type: "LineString", coordinates: [[10, -20], [130, -30]]}
-      ]
-            var routesPaths = link.map( (l) => {
+            var routesPaths = this.state.links.map((l) => {
                 return h('path', {
-                    d: pathGenerator(l),
-                    fill: "none", stroke: "yellow", "stroke-width": 8, tooltip: "route"
+                    d: pathGenerator({
+                        type: "LineString", coordinates: [[l.longitude_from, l.latitude_from],
+                        [l.longitude_to, l.latitude_to]]
+                    }
+                    ),
+                    fill: "none", stroke: "skyblue",
+                    "stroke-linecap": "round",
+                    "stroke-width": l.seats_2024 / 1e6, tooltip: "route"
                 });
             });
             return h('div',
-                { onMouseMove: this.handleMouseMove }
+                {
+                    onMouseMove: this.handleMouseMove,
+                    onTouchStart: this.handleMouseDown,
+                    onTouchMove: this.handleMouseUp,
+                    onTouchEnd: this.handleMouseUp
+                }
                 , h('svg', { width: width, height: height }, h('g',
-                    null, featuresPaths.concat(routesPaths))
+                    null, featuresPaths.concat(routesPaths).concat(populi))
                     //h('g', { style: "stroke-width:8; fill: none"}, routesPaths)
                 ));
-        }
+        } else return h('h4', null, "Loading...");
     }
 }
 
-render(h(PostcapitalMap), document.body);
+render(h(PostcapitalMap), document.getElementById('pm'));
 
 // exports.default = PostcapitalMap;
