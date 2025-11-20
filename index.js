@@ -20,7 +20,7 @@ class PostcapitalMap extends Component {
 
             data: [], isLandLoading: true,
             isLinksLoading: true,
-            isCitiesLoading: true, rotate: [t, -30],
+            isCitiesLoading: true, rotate: [t, -35],
             links: [], cities: [],
             projection: geoConicEquidistant(), features: null
         }
@@ -97,12 +97,12 @@ class PostcapitalMap extends Component {
     }
 
     handleTouchUp = (e) => {
-        this.setState({ rotate: [e.touches[0].pageX/2, -30] })
+        this.setState({ rotate: [e.touches[0].pageX/2 % 360, -35] })
         //console.log("handleMouseUp:" + e.pageY)
     }
 
     handleMouseMove = (e) => {
-        this.setState({ rotate: [e.pageX/2, -30] })
+        this.setState({ rotate: [e.pageX % 360, -35] })
         //console.log("handleMouseMove:" + e.pageX)
     }
 
@@ -113,14 +113,14 @@ class PostcapitalMap extends Component {
         // var path = null
         // var circle = geoCircle().center([-4.42, 55.84]).radius(1);
         if (!this.state.isLandLoading) {
-            const countries = feature(this.state.data, this.state.data.objects.land)
+            const countries = feature(this.state.data, this.state.data.objects.land);
             //const outline = { type: "Sphere" }
-            
-                //.fitExtent([[0.7, 0.7], [this.state.widt - 0.7, this.state.height - 0.7]], outline)
+
+            //.fitExtent([[0.7, 0.7], [this.state.widt - 0.7, this.state.height - 0.7]], outline)
             const pathGenerator = geoPath().projection(this.state.projection
                 .rotate(this.state.rotate)
-                .scale(window.screen.width/2));
-                //scale(window.screen.width/10)
+                .scale(window.screen.height / 4));
+            //scale(window.screen.width/10)
             var featuresPaths = countries.features.map((f) => {
                 const countryName = f.name;
 
@@ -162,11 +162,11 @@ class PostcapitalMap extends Component {
                     onTouchMove: this.handleTouchUp,
                     onTouchEnd: this.handleTouchUp
                 }
-                , h('svg', { viewBox: `0 0 ${window.screen.width} ${window.screen.width/2}` }, h('g',
+                , h('svg', { viewBox: `0 0 ${window.screen.width} ${window.screen.height / 2}` }, h('g',
                     null, featuresPaths.concat(routesPaths).concat(populi))
                     //h('g', { style: "stroke-width:8; fill: none"}, routesPaths)
                 ));
-        } else return h('h4', null, "Loading...");
+        } else return h('h4', null, "loading...");
     }
 }
 
