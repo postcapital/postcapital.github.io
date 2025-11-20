@@ -14,13 +14,13 @@ class PostcapitalMap extends Component {
     constructor(props) {
 
         super();
-
+        var t = Date.now();
         this.state = {
             time: Date.now(),
 
             data: [], isLandLoading: true,
             isLinksLoading: true,
-            isCitiesLoading: true, rotate: [0, 0],
+            isCitiesLoading: true, rotate: [t, -30],
             links: [], cities: [],
             projection: geoConicEquidistant(), features: null
         }
@@ -96,13 +96,13 @@ class PostcapitalMap extends Component {
         //console.log("handleMouseDown:" + e.pageY)
     }
 
-    handleMouseUp = (e) => {
-        this.setState({ rotate: [e.touches[0].pageX, e.touches[0].pageY] })
+    handleTouchUp = (e) => {
+        this.setState({ rotate: [e.touches[0].pageX/2, -30] })
         //console.log("handleMouseUp:" + e.pageY)
     }
 
     handleMouseMove = (e) => {
-        this.setState({ rotate: [e.pageX, 0] })
+        this.setState({ rotate: [e.pageX/2, -30] })
         //console.log("handleMouseMove:" + e.pageX)
     }
 
@@ -118,9 +118,9 @@ class PostcapitalMap extends Component {
             
                 //.fitExtent([[0.7, 0.7], [this.state.widt - 0.7, this.state.height - 0.7]], outline)
             const pathGenerator = geoPath().projection(this.state.projection
-                .rotate(this.state.rotate));
-                //fitExtent([0.7,0.7], [window.screen.width, window.screen.height/2]));
-                //.scale(this.state.width / 10));
+                .rotate(this.state.rotate)
+                .scale(window.screen.width/2));
+                //scale(window.screen.width/10)
             var featuresPaths = countries.features.map((f) => {
                 const countryName = f.name;
 
@@ -134,9 +134,10 @@ class PostcapitalMap extends Component {
                 var circle = geoCircle().center([c.longitude, c.latitude]).radius(c.population / 2e6)();
                 return h('path', {
                     d: pathGenerator(circle),
-                    stroke: "orange",
+                    stroke: "darkorange",
                     fill: "none",
-                    "stroke-opacity": "30%"
+                    "stroke-opacity": "25%",
+                    "stroke-width": 2
                 }
                 );
             })
@@ -151,17 +152,17 @@ class PostcapitalMap extends Component {
                     fill: "none", stroke: "skyblue",
                     "stroke-linecap": "round",
                     "stroke-opacity": "25%",
-                    "stroke-width": l.seats_2024 / 4e5, tooltip: "route"
+                    "stroke-width": l.seats_2024 / 4e5
                 });
             });
             return h('div',
                 {
                     onMouseMove: this.handleMouseMove,
                     onTouchStart: this.handleMouseDown,
-                    onTouchMove: this.handleMouseUp,
-                    onTouchEnd: this.handleMouseUp
+                    onTouchMove: this.handleTouchUp,
+                    onTouchEnd: this.handleTouchUp
                 }
-                , h('svg', { width: window.screen.width, height: window.screen.width/2 }, h('g',
+                , h('svg', { viewBox: `0 0 ${window.screen.width} ${window.screen.width/2}` }, h('g',
                     null, featuresPaths.concat(routesPaths).concat(populi))
                     //h('g', { style: "stroke-width:8; fill: none"}, routesPaths)
                 ));
@@ -171,4 +172,3 @@ class PostcapitalMap extends Component {
 
 render(h(PostcapitalMap), document.getElementById('pm'));
 
-// exports.default = PostcapitalMap;
