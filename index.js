@@ -2,8 +2,6 @@
 
 'use strict';
 
-// import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-// import {forceSimulation, forceCollide, forceX} from "https://cdn.jsdelivr.net/npm/d3-force@3/+esm";
 import { h, render, Component } from 'https://cdn.jsdelivr.net/npm/preact@10.27.2/+esm'; // import './ChoropethMap';
 import {
     geoProjection, geoConicEquidistant, geoCircle, geoPath
@@ -14,14 +12,12 @@ class PostcapitalMap extends Component {
     constructor(props) {
 
         super();
-        var t = Date.now();
+        const t = new Date().getTimezoneOffset() * 90 | 0;
         this.state = {
-            time: Date.now(),
-
-            data: [], isLandLoading: true,
+            isLandLoading: true,
             isLinksLoading: true,
             isCitiesLoading: true, rotate: [t, -35],
-            links: [], cities: [],
+            data: [], links: [], cities: [],
             projection: geoConicEquidistant(), features: null
         }
         console.log("Map instantiated");
@@ -97,20 +93,17 @@ class PostcapitalMap extends Component {
     }
 
     handleTouchUp = (e) => {
-        this.setState({ rotate: [e.touches[0].pageX/2 % 360, -35] })
-        //console.log("handleMouseUp:" + e.pageY)
+        this.setState({
+            rotate: [e.touches[0].pageX % window.screen.width, -35],
+        })
     }
 
     handleMouseMove = (e) => {
-        this.setState({ rotate: [e.pageX % 360, -35] })
-        //console.log("handleMouseMove:" + e.pageX)
+        this.setState({ rotate: [e.pageX, -35] })
     }
-
 
     render(state) {
 
-        // var featuresPaths = null
-        // var path = null
         // var circle = geoCircle().center([-4.42, 55.84]).radius(1);
         if (!this.state.isLandLoading) {
             const countries = feature(this.state.data, this.state.data.objects.land);
@@ -119,9 +112,9 @@ class PostcapitalMap extends Component {
             //.fitExtent([[0.7, 0.7], [this.state.widt - 0.7, this.state.height - 0.7]], outline)
             const pathGenerator = geoPath().projection(this.state.projection
                 .rotate(this.state.rotate)
-                .scale(window.screen.height / 4));
+                .scale(400));
             //scale(window.screen.width/10)
-            var featuresPaths = countries.features.map((f) => {
+            const featuresPaths = countries.features.map((f) => {
                 const countryName = f.name;
 
                 return h('path', {
@@ -129,15 +122,22 @@ class PostcapitalMap extends Component {
                     fill: "#c5d3d8", tooltip: countryName
                 });
             });
-            var populi = this.state.cities.map((c) => {
-
-                var circle = geoCircle().center([c.longitude, c.latitude]).radius(c.population / 2e6)();
+            const populi = this.state.cities.map((c) => {
+                // const circle = geoCircle().center([c.longitude, c.latitude]).
+                const x = c.population / 1e6;
+                const ax = c.longitude;
+                const ay = c.latitude;
+                //console.log(ax+ay);
                 return h('path', {
-                    d: pathGenerator(circle),
-                    stroke: "darkorange",
+                    d: pathGenerator({
+                        type: "LineString", coordinates: [[ax, ay + x * .577],
+                        [ax - x / 2, ay - .288 * x], [ax + x / 2, ay - .288 * x], [ax, ay + x * .577]]
+                    }),
+                    stroke: "violet",
                     fill: "none",
-                    "stroke-opacity": "25%",
-                    "stroke-width": 2
+
+                    "stroke-opacity": "4%",
+                    "stroke-width": 16
                 }
                 );
             })
@@ -147,12 +147,11 @@ class PostcapitalMap extends Component {
                     d: pathGenerator({
                         type: "LineString", coordinates: [[l.longitude_from, l.latitude_from],
                         [l.longitude_to, l.latitude_to]]
-                    }
-                    ),
+                    }),
                     fill: "none", stroke: "skyblue",
                     "stroke-linecap": "round",
-                    "stroke-opacity": "25%",
-                    "stroke-width": l.seats_2024 / 4e5
+                    "stroke-opacity": "40%",
+                    "stroke-width": l.seats_2024 / 5e5
                 });
             });
             return h('div',
@@ -162,7 +161,7 @@ class PostcapitalMap extends Component {
                     onTouchMove: this.handleTouchUp,
                     onTouchEnd: this.handleTouchUp
                 }
-                , h('svg', { viewBox: `0 0 ${window.screen.width} ${window.screen.height / 2}` }, h('g',
+                , h('svg', { viewBox: `0 0 ${window.screen.width - 8} ${window.screen.width - 5 / 2}` }, h('g',
                     null, featuresPaths.concat(routesPaths).concat(populi))
                     //h('g', { style: "stroke-width:8; fill: none"}, routesPaths)
                 ));
