@@ -4,7 +4,8 @@
 
 import { h, render, Component } from 'https://cdn.jsdelivr.net/npm/preact@10.27.2/+esm'; // import './ChoropethMap';
 import {
-    geoProjection, geoConicEquidistant, geoCircle, geoPath
+    geoAzimuthalEquidistant,
+    geoConicEquidistant, geoPath, geoGraticule
 } from "https://cdn.jsdelivr.net/npm/d3-geo@3/+esm";
 import { feature } from "https://cdn.jsdelivr.net/npm/topojson-client@3/+esm";
 
@@ -112,7 +113,7 @@ class PostcapitalMap extends Component {
             //.fitExtent([[0.7, 0.7], [this.state.widt - 0.7, this.state.height - 0.7]], outline)
             const pathGenerator = geoPath().projection(this.state.projection
                 .rotate(this.state.rotate)
-                .scale(400));
+                .scale(400).translate([200, 100]));
             //scale(window.screen.width/10)
             const featuresPaths = countries.features.map((f) => {
                 const countryName = f.name;
@@ -124,25 +125,58 @@ class PostcapitalMap extends Component {
             });
             const populi = this.state.cities.map((c) => {
                 // const circle = geoCircle().center([c.longitude, c.latitude]).
-                const x = c.population / 1e6;
+                const x = c.population / 5e6;
                 const ax = c.longitude;
                 const ay = c.latitude;
                 //console.log(ax+ay);
                 return h('path', {
                     d: pathGenerator({
-                        type: "LineString", coordinates: [[ax, ay + x * .577],
-                        [ax - x / 2, ay - .288 * x], [ax + x / 2, ay - .288 * x], [ax, ay + x * .577]]
+                        type: "LineString", coordinates: [
+                            [ax - x, ay - x],
+                            [ax - x, ay + x], [ax + x, ay + x], [ax + x, ay - x],
+                            [ax - x, ay - x]]
                     }),
-                    stroke: "violet",
+                    stroke: "deeppink",
                     fill: "none",
 
-                    "stroke-opacity": "4%",
-                    "stroke-width": 16
+                    "stroke-opacity": "20%",
+                    "stroke-width": 1
                 }
                 );
-            })
+            });
+            /*
+                 const elevations = this.state.cities.map((c) => {
+                     // const circle = geoCircle().center([c.longitude, c.latitude]).
+                     const x = c.elevation / 1e3;
+                     const ax = c.longitude;
+                     const ay = c.latitude;
+                     //console.log(ax+ay);
+                     return h('path', {
+                 // equilateral triangles
+                         d: pathGenerator({
+                             type: "LineString", coordinates: [[ax, ay + x * .577],
+                             [ax - x / 2, ay - .288 * x], [ax + x / 2, ay - .288 * x], [ax, ay + x * .577]]
+                         }),
+                         stroke: "yellow",
+                         fill: "none",
+     
+                         "stroke-opacity": "4%",
+                         "stroke-width": 8
+                     });
+                 })*/
 
-            var routesPaths = this.state.links.map((l) => {
+            const graticule = geoGraticule();
+            const graticulePaths = graticule.lines().map((g) => {
+                return h('path', {
+                    d: pathGenerator(g),
+                    stroke: "gray",
+                    fill: "none",
+
+                    "stroke-opacity": "20%",
+                    "stroke-width": 1
+                });
+            });
+            const routesPaths = this.state.links.map((l) => {
                 return h('path', {
                     d: pathGenerator({
                         type: "LineString", coordinates: [[l.longitude_from, l.latitude_from],
@@ -162,12 +196,16 @@ class PostcapitalMap extends Component {
                     onTouchEnd: this.handleTouchUp
                 }
                 , h('svg', { viewBox: `0 0 ${window.screen.width - 8} ${window.screen.width - 5 / 2}` }, h('g',
-                    null, featuresPaths.concat(routesPaths).concat(populi))
+                    null, featuresPaths.concat(routesPaths).concat(populi)
+                        .concat(graticulePaths)
+
+                )
                     //h('g', { style: "stroke-width:8; fill: none"}, routesPaths)
                 ));
         } else return h('h4', null, "loading...");
     }
 }
-
-render(h(PostcapitalMap), document.getElementById('pm'));
+const div1 = document.createElement("div");
+document.body.appendChild(div1);
+render(h(PostcapitalMap), div1);
 
